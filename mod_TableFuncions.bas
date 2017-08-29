@@ -30,6 +30,7 @@
 ' retornaNomePlanilha
 ' activateTable
 ' deactivateTable
+' verificaTabelaExiste
 '
 '
 ' Funções Privadas:
