@@ -1,19 +1,18 @@
-Attribute VB_Name = "mod_TableFuncions"
 ' -------------------------------------------------------
 '
-' Módulo Table Functions
+' MÃ³dulo Table Functions
 '
-' Possui diversas funções para trabalhar com tabelas
-' pré-formatadas no Excel
+' Possui diversas funÃ§Ãµes para trabalhar com tabelas
+' prÃ©-formatadas no Excel
 '
 '
-' Versão: 0.4.1
+' VersÃ£o: 0.4.2
 '
-' Última atualização: 29/08/2017
+' Ãšltima atualizaÃ§Ã£o: 29/08/2017
 '
 ' -------------------------------------------------------
 '
-' Lista de funções:
+' Lista de funÃ§Ãµes:
 '
 ' limparFiltroTabela
 ' filtrarTabelaPorCampo
@@ -33,7 +32,7 @@ Attribute VB_Name = "mod_TableFuncions"
 ' deactivateTable
 '
 '
-' Funções Privadas:
+' FunÃ§Ãµes Privadas:
 '
 ' addSortFieldToTable
 ' inserirNovaLinha
@@ -59,7 +58,7 @@ Dim TABELA As ListObject
 Exit Function
 TabelaInexistente:
     MsgBox "Erro ao limpar filtro da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
-        "Provavelmente foi excluída indevidamente", vbCritical, "Erro - limparFiltroTabela - mod_TableFunctions"
+        "Provavelmente foi excluÃ­da indevidamente", vbCritical, "Erro - limparFiltroTabela - mod_TableFunctions"
 
 End Function
 
@@ -78,11 +77,11 @@ Dim FIELD_NAME As Variant
     TABELA.Sort.SortFields.Clear
     If IsArray(NOME_CAMPO_S) Then
         For Each FIELD_NAME In NOME_CAMPO_S
-            ' Função privada dentro desse módulo
+            ' FunÃ§Ã£o privada dentro desse mÃ³dulo
             addSortFieldToTable TABELA, NOME_TABELA, CStr(FIELD_NAME)
         Next
     Else
-        ' Função privada dentro desse módulo
+        ' FunÃ§Ã£o privada dentro desse mÃ³dulo
         addSortFieldToTable TABELA, NOME_TABELA, CStr(NOME_CAMPO_S)
     End If
     With TABELA.Sort
@@ -96,7 +95,7 @@ Dim FIELD_NAME As Variant
 Exit Function
 ErroOrdenar:
     MsgBox "Erro ao ordendar a tabela: '" & NOME_TABELA & "'" & vbNewLine & _
-        "Provavelmente foi excluída indevidamente", vbCritical, "Erro - ordenarTabelaPorCampo - mod_TableFunctions"
+        "Provavelmente foi excluÃ­da indevidamente", vbCritical, "Erro - ordenarTabelaPorCampo - mod_TableFunctions"
 
 End Function
 
@@ -137,7 +136,7 @@ End Function
 Function retornarNumeroColuna(ByVal NOME_TABELA As String, _
                                     ByVal NOME_COLUNA As String) As Integer
 '
-' Retorna o número da coluna de um determinado campo (cabeçalho) de uma tabela
+' Retorna o nÃºmero da coluna de um determinado campo (cabeÃ§alho) de uma tabela
 '
 Dim TABELA As ListObject
 Dim COLUMN_NUMBER As Integer
@@ -149,14 +148,14 @@ Dim COLUMN_NUMBER As Integer
         
 Exit Function
 ErroRetornar:
-    MsgBox "Erro buscar número da coluna na tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - retornarNumeroColuna - mod_TableFunctions"
+    MsgBox "Erro buscar nÃºmero da coluna na tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - retornarNumeroColuna - mod_TableFunctions"
 
 End Function
 
 Function retornarQtdLinhasTabela(ByVal NOME_TABELA As String, _
                                  Optional ByVal CONSIDERA_FILTRO As Boolean = True) As Integer
 '
-' Retorna a quantidade de linhas de uma tabela, levando em consideração o filtro atual aplicado
+' Retorna a quantidade de linhas de uma tabela, levando em consideraÃ§Ã£o o filtro atual aplicado
 '
 Dim TABELA As ListObject
     Application.ScreenUpdating = False
@@ -179,7 +178,7 @@ Function retornarQtdLinhasColuna(ByVal NOME_TABELA As String, _
                                  ByVal NOME_COLUNA As String, _
                                  Optional ByVal SOMENTE_NAO_VAZIAS As Boolean = True) As Integer
 '
-' Retorna a quantidade de linhas de uma tabela, levando em consideração o filtro atual aplicado
+' Retorna a quantidade de linhas de uma tabela, levando em consideraÃ§Ã£o o filtro atual aplicado
 '
 Dim TABELA As ListObject
 Dim COLUMN_NUMBER As Integer
@@ -303,7 +302,7 @@ End Function
 Function converterTextoEmNumero(ByVal NOME_TABELA As String, _
                                     ByVal NOME_COLUNA As String)
 '
-' Converte os dados de determinada Coluna em determinada Tabela em número
+' Converte os dados de determinada Coluna em determinada Tabela em nÃºmero
 '
 Dim TABELA As ListObject
 Dim COLUMN_NUMBER As Integer
@@ -366,7 +365,7 @@ Function inserirFormulaColuna(ByVal NOME_TABELA As String, _
                                     ByVal NOME_COLUNA As String, _
                                     ByVal FORMULA_ As String) As Boolean
 '
-' Insere uma fórmula (string) em um determinada coluna
+' Insere uma fÃ³rmula (string) em um determinada coluna
 '
 Dim TABELA As ListObject
 Dim COLUMN_NUMBER As Integer
@@ -384,7 +383,7 @@ Dim COLUMN_NUMBER As Integer
 Exit Function
 ErroInserir:
     inserirFormulaColuna = False
-    MsgBox "Erro ao inserir fórmula na coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - inserirFormulaColuna - mod_TableFunctions"
+    MsgBox "Erro ao inserir fÃ³rmula na coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - inserirFormulaColuna - mod_TableFunctions"
 End Function
 
 Function inserirDadoTabela(ByVal NOME_TABELA As String, _
@@ -445,7 +444,7 @@ End Function
 
 Function activateTable(ByVal NOME_TABELA As String) As Boolean
 '
-' Ativa a planilha da tabela para seleção
+' Ativa a planilha da tabela para seleÃ§Ã£o
 '
 Dim TABELA As ListObject
     Application.ScreenUpdating = False
@@ -467,7 +466,7 @@ End Function
 
 Function deactivateTable(ByVal NOME_TABELA As String) As Boolean
 '
-' Desativa a planilha da tabela para seleção
+' Desativa a planilha da tabela para seleÃ§Ã£o
 '
 Dim TABELA As ListObject
     Application.ScreenUpdating = False
@@ -486,11 +485,27 @@ ErroActive:
     
 End Function
 
+Function verificaTabelaExiste(ByVal NOME_TABELA As String) As Boolean
+'
+' Inserir nova linha em tabela
+'
+Dim TABELA As ListObject
+    Application.ScreenUpdating = False
+    On Error GoTo Erro
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    verificaTabelaExiste = True
+Exit Function
+
+Erro:
+    verificaTabelaExiste = True
+End Function
+
+
 ' -------------------------------------------------------
-' Funções Privadas
+' FunÃ§Ãµes Privadas
 ' -------------------------------------------------------
 '
-' @TODO - Funções privadas devem retornar TRUE ou FALSE
+' @TODO - FunÃ§Ãµes privadas devem retornar TRUE ou FALSE
 
 Private Function inserirNovaLinha(ByVal NOME_TABELA As String, _
                                 Optional POSITION_ As Integer, _
@@ -528,7 +543,7 @@ Private Function addSortFieldToTable(ByRef TABELA As ListObject, _
                                      ByRef NOME_TABELA As String, _
                                      ByRef NOME_CAMPO As String)
 '
-' Adiciona Filtro à uma tabela
+' Adiciona Filtro Ã  uma tabela
 '
     TABELA.Sort.SortFields.Add Key:=Range(NOME_TABELA & "[[#All],[" & NOME_CAMPO & "]]") _
         , SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
