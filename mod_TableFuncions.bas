@@ -7,7 +7,7 @@ Attribute VB_Name = "mod_TableFuncions"
 ' pré-formatadas no Excel
 '
 '
-' Versão: 0.4
+' Versão: 0.4.1
 '
 ' Última atualização: 29/08/2017
 '
@@ -214,10 +214,6 @@ Dim COLUMN_NUMBER As Integer
         Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
     COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_COLUNA, TABELA.HeaderRowRange, 0)
 
-'    If ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).Visible <> xlSheetVisible Then
-'        ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).Visible = xlSheetVisible
-'    End If
-'    ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).Activate
     activateTable NOME_TABELA
     
     If TODOS_OS_DADOS Then
@@ -508,16 +504,16 @@ Dim NEW_ROW As Object
     On Error GoTo ErroInserir
         Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
         On Error GoTo SemDados
-            ' Ativa Planilhapara usar o DataBodyRange
+            ' Ativa Planilhapara usar o Select
             activateTable NOME_TABELA
             
-            TABELA.DataBodyRange.Select
-            
-            If POSITION_ Then
-                Set NEW_ROW = TABELA.ListRows.Add(POSITION:=POSITION_, AlwaysInsert:=ALWAYS_INSERT_)
-            Else
-                Set NEW_ROW = TABELA.ListRows.Add(AlwaysInsert:=ALWAYS_INSERT_)
-            End If
+        TABELA.DataBodyRange.Select
+        
+        If POSITION_ Then
+            Set NEW_ROW = TABELA.ListRows.Add(POSITION:=POSITION_, AlwaysInsert:=ALWAYS_INSERT_)
+        Else
+            Set NEW_ROW = TABELA.ListRows.Add(AlwaysInsert:=ALWAYS_INSERT_)
+        End If
         inserirNovaLinha = NEW_ROW.Range.Row
 Exit Function
 
