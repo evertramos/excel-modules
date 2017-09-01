@@ -5,10 +5,7 @@
 ' Possui diversas funções para trabalhar com tabelas
 ' pré-formatadas no Excel
 '
-'
-' Versão: 0.4.2
-'
-' Última atualização: 29/08/2017
+' Versão: 0.5
 '
 ' -------------------------------------------------------
 '
@@ -19,6 +16,7 @@
 ' retornarNumeroColuna
 ' retornarQtdLinhasTabela
 ' retornarQtdLinhasColuna
+' Retornar_Nome_Todas_Tabelas
 ' selecionarDadosDaColuna
 ' selecionarDadosDaTabela
 ' selecionarLinhaDaTabela
@@ -43,28 +41,12 @@
 
 Option Explicit
 
-Function limparFiltroTabela(ByRef NOME_TABELA As String)
-'
-' Limpa todos os filtros de uma Tabela
-'
-Dim TABELA As ListObject
-    Application.ScreenUpdating = False
-    On Error GoTo TabelaInexistente
-        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
-    TABELA.ShowAutoFilter = True
-    If TABELA.AutoFilter.FilterMode Then
-        TABELA.AutoFilter.ShowAllData
-    End If
-    
-Exit Function
-TabelaInexistente:
-    MsgBox "Erro ao limpar filtro da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
-        "Provavelmente foi excluída indevidamente", vbCritical, "Erro - limparFiltroTabela - mod_TableFunctions"
-
-End Function
+' -------------------------------------------------------
+' Funções de Ordenação de Dados
+' -------------------------------------------------------
 
 Function ordenarTabelaPorCampo(ByRef NOME_TABELA As String, _
-                                ByRef NOME_CAMPO_S As Variant)
+                                Optional ByRef NOME_CAMPO_S As Variant)
 '
 ' Ordena Tabela por coluna
 '
@@ -96,9 +78,13 @@ Dim FIELD_NAME As Variant
 Exit Function
 ErroOrdenar:
     MsgBox "Erro ao ordendar a tabela: '" & NOME_TABELA & "'" & vbNewLine & _
-        "Provavelmente foi excluída indevidamente", vbCritical, "Erro - ordenarTabelaPorCampo - mod_TableFunctions"
+        "Provavelmente foi excluída indevidamente", vbCritical, "Erro - ordenarTabelaPorCampo - Módulo: m_TableFunctions"
 
 End Function
+
+' -------------------------------------------------------
+' Funções de Filtros nas Tabelas
+' -------------------------------------------------------
 
 Function filtrarTabelaPorCampo(ByRef NOME_TABELA As String, _
                                 ByRef NOME_CAMPO As String, _
@@ -130,8 +116,47 @@ Dim PRETECTED As Boolean
     
 Exit Function
 ErroFiltrar:
-    MsgBox "Erro ao filtrar a tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - filtrarTabelaPorCampo - mod_TableFunctions"
+    MsgBox "Erro ao filtrar a tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - filtrarTabelaPorCampo - Módulo: m_TableFunctions"
 
+End Function
+
+Function limparFiltroTabela(ByRef NOME_TABELA As String)
+'
+' Limpa todos os filtros de uma Tabela
+'
+Dim TABELA As ListObject
+    Application.ScreenUpdating = False
+    On Error GoTo TabelaInexistente
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    TABELA.ShowAutoFilter = True
+    If TABELA.AutoFilter.FilterMode Then
+        TABELA.AutoFilter.ShowAllData
+    End If
+    
+Exit Function
+TabelaInexistente:
+    MsgBox "Erro ao limpar filtro da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente foi excluída indevidamente", vbCritical, "Erro - limparFiltroTabela - Módulo: m_TableFunctions"
+
+End Function
+
+' -------------------------------------------------------
+' Funções de Retorno de Dados
+' -------------------------------------------------------
+
+Function retornaNomePlanilha(ByVal NOME_TABELA As String) As String
+'
+' Retorna Nome da planilha com determinada Tabela
+'
+Dim TABELA As ListObject
+    Application.ScreenUpdating = False
+    On Error GoTo Erro
+        retornaNomePlanilha = Range(NOME_TABELA).Parent.Name
+
+Exit Function
+Erro:
+    retornaNomePlanilha = ""
+    Exit Function
 End Function
 
 Function retornarNumeroColuna(ByVal NOME_TABELA As String, _
@@ -149,7 +174,7 @@ Dim COLUMN_NUMBER As Integer
         
 Exit Function
 ErroRetornar:
-    MsgBox "Erro buscar número da coluna na tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - retornarNumeroColuna - mod_TableFunctions"
+    MsgBox "Erro buscar número da coluna na tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - retornarNumeroColuna - Módulo: m_TableFunctions"
 
 End Function
 
@@ -171,7 +196,7 @@ Dim TABELA As ListObject
         
 Exit Function
 ErroRetornar:
-    MsgBox "Erro ao buscar a quantidade de linhas da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - retornarQtdLinhasTabela - mod_TableFunctions"
+    MsgBox "Erro ao buscar a quantidade de linhas da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - retornarQtdLinhasTabela - Módulo: m_TableFunctions"
 
 End Function
 
@@ -197,9 +222,69 @@ Dim COLUMN_NUMBER As Integer
         
 Exit Function
 ErroRetornar:
-    MsgBox "Erro ao buscar a quantidade de linhas da coluna: '" & NOME_COLUNA & "da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - retornarQtdLinhasColuna - mod_TableFunctions"
+    MsgBox "Erro ao buscar a quantidade de linhas da coluna: '" & NOME_COLUNA & "da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - retornarQtdLinhasColuna - Módulo: m_TableFunctions"
 
 End Function
+
+Function Retornar_Nome_Todas_Tabelas() As Variant
+'
+' Retorna o número da tabelas da planilha
+'
+Dim PLANILHA As Worksheet
+Dim TABELA As ListObject
+Dim NOMES As Variant
+Dim i As Integer
+    
+    Application.ScreenUpdating = False
+    
+    ReDim NOMES(1 To Retornar_Qtd_Tabelas)
+    
+    On Error GoTo ErroRetornar
+    i = 1
+    'Loop em todas as planilhas
+    For Each PLANILHA In ThisWorkbook.Worksheets
+        For Each TABELA In PLANILHA.ListObjects
+            NOMES(i) = TABELA.Name
+            i = i + 1
+        Next
+    Next
+    Retornar_Nome_Todas_Tabelas = NOMES
+    
+Exit Function
+ErroRetornar:
+    MsgBox "Erro buscar o nome das tabelas da planilha.", vbCritical, "Erro -  Retornar_Nome_Todas_Tabelas - Módulo: m_TableFunctions"
+
+End Function
+
+Function Retornar_Qtd_Tabelas() As Integer
+'
+' Retorna o número da tabelas da planilha
+'
+Dim PLANILHA As Worksheet
+Dim TABELA As ListObject
+Dim i As Integer
+    
+    Application.ScreenUpdating = False
+    
+    On Error GoTo ErroRetornar
+    i = 0
+    'Loop em todas as planilhas
+    For Each PLANILHA In ThisWorkbook.Worksheets
+        For Each TABELA In PLANILHA.ListObjects
+            i = i + 1
+        Next
+    Next
+    Retornar_Qtd_Tabelas = i
+    
+Exit Function
+ErroRetornar:
+    MsgBox "Erro buscar a quantidade de tabelas da planilha.", vbCritical, "Erro -  Retornar_Qtd_Tabelas - Módulo: m_TableFunctions"
+
+End Function
+
+' -------------------------------------------------------
+' Funções de Seleção de Dados
+' -------------------------------------------------------
 
 Function selecionarDadosDaColuna(ByVal NOME_TABELA As String, _
                                     ByVal NOME_COLUNA As String, _
@@ -229,7 +314,7 @@ SemDados:
     selecionarDadosDaColuna = False
     Exit Function
 ErroSelecionar:
-    MsgBox "Erro ao selecionar os dados da coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - selecionarDadosDaColuna - mod_TableFunctions"
+    MsgBox "Erro ao selecionar os dados da coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - selecionarDadosDaColuna - Módulo: m_TableFunctions"
     selecionarDadosDaColuna = False
     Exit Function
 End Function
@@ -262,7 +347,7 @@ SemDados:
     selecionarDadosDaTabela = False
     Exit Function
 ErroSelecionar:
-    MsgBox "Erro ao selecionar os dados da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - selecionarDadosDaTabela - mod_TableFunctions"
+    MsgBox "Erro ao selecionar os dados da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - selecionarDadosDaTabela - Módulo: m_TableFunctions"
     selecionarDadosDaTabela = False
     Exit Function
 End Function
@@ -295,10 +380,14 @@ SemDados:
     selecionarLinhaDaTabela = False
     Exit Function
 ErroSelecionar:
-    MsgBox "Erro ao selecionar a linha: '" & LINHA_TABELA & "'" & " da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - selecionarLinhaDaTabela - mod_TableFunctions"
+    MsgBox "Erro ao selecionar a linha: '" & LINHA_TABELA & "'" & " da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - selecionarLinhaDaTabela - Módulo: m_TableFunctions"
     selecionarLinhaDaTabela = False
     Exit Function
 End Function
+
+' -------------------------------------------------------
+' Funções de Formatação
+' -------------------------------------------------------
 
 Function converterTextoEmNumero(ByVal NOME_TABELA As String, _
                                     ByVal NOME_COLUNA As String)
@@ -318,9 +407,13 @@ Dim COLUMN_NUMBER As Integer
         
 Exit Function
 ErroConverter:
-    MsgBox "Erro buscar converter os dados da coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - converterTextoEmNumero - mod_TableFunctions"
+    MsgBox "Erro buscar converter os dados da coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - converterTextoEmNumero - Módulo: m_TableFunctions"
 
 End Function
+
+' -------------------------------------------------------
+' Funções de Inserção, Edição e Exclusão de Dados
+' -------------------------------------------------------
 
 Function deletarDadosTabela(ByVal NOME_TABELA As String)
 '
@@ -337,7 +430,7 @@ Dim TABELA As ListObject
        
 Exit Function
 ErroDeletar:
-    MsgBox "Erro ao deletar todos os dados da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - deletarDadosTabela - mod_TableFunctions"
+    MsgBox "Erro ao deletar todos os dados da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - deletarDadosTabela - Módulo: m_TableFunctions"
 
 End Function
 
@@ -359,7 +452,7 @@ Dim TABELA As ListObject
 Exit Function
 ErroInserir:
     inserirNovaColuna = 0
-    MsgBox "Erro ao inserir a coluna: '" & NOME_COLUNA & "' na tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - inserirColuna - mod_TableFunctions"
+    MsgBox "Erro ao inserir a coluna: '" & NOME_COLUNA & "' na tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - inserirColuna - Módulo: m_TableFunctions"
 End Function
 
 Function inserirFormulaColuna(ByVal NOME_TABELA As String, _
@@ -384,7 +477,7 @@ Dim COLUMN_NUMBER As Integer
 Exit Function
 ErroInserir:
     inserirFormulaColuna = False
-    MsgBox "Erro ao inserir fórmula na coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - inserirFormulaColuna - mod_TableFunctions"
+    MsgBox "Erro ao inserir fórmula na coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - inserirFormulaColuna - Módulo: m_TableFunctions"
 End Function
 
 Function inserirDadoTabela(ByVal NOME_TABELA As String, _
@@ -402,7 +495,11 @@ Dim FIELD_NAME As Variant
     Application.ScreenUpdating = False
     On Error GoTo ErroInserir
         Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
-    COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_COLUNA, TABELA.HeaderRowRange, 0)
+    If NOME_COLUNA <> "" Then
+        COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_COLUNA, TABELA.HeaderRowRange, 0)
+    Else
+        COLUMN_NUMBER = 1
+    End If
     
     If Not LINHA_DESTINO > 0 Then
         NEW_ROW = inserirNovaLinha(NOME_TABELA)
@@ -425,22 +522,7 @@ Dim FIELD_NAME As Variant
        
 Exit Function
 ErroInserir:
-    MsgBox "Erro ao inserir dados na coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - inserirDadoTabela - mod_TableFunctions"
-End Function
-
-Function retornaNomePlanilha(ByVal NOME_TABELA As String) As String
-'
-' Retorna Nome da planilha com determinada Tabela
-'
-Dim TABELA As ListObject
-    Application.ScreenUpdating = False
-    On Error GoTo Erro
-        retornaNomePlanilha = Range(NOME_TABELA).Parent.Name
-
-Exit Function
-Erro:
-    retornaNomePlanilha = ""
-    Exit Function
+    MsgBox "Erro ao inserir dados na coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - inserirDadoTabela - Módulo: m_TableFunctions"
 End Function
 
 Function activateTable(ByVal NOME_TABELA As String) As Boolean
@@ -485,6 +567,10 @@ ErroActive:
     deactivateTable = False
     
 End Function
+
+' -------------------------------------------------------
+' Funções de Verificação
+' -------------------------------------------------------
 
 Function verificaTabelaExiste(ByVal NOME_TABELA As String) As Boolean
 '
@@ -537,7 +623,7 @@ SemDados:
     inserirNovaLinha = TABELA.Range.Rows.count
     Exit Function
 ErroInserir:
-    MsgBox "Erro ao inserir nova linha na tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - inserirNovaLInha - mod_TableFunctions"
+    MsgBox "Erro ao inserir nova linha na tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - inserirNovaLInha - Módulo: m_TableFunctions"
 End Function
 
 Private Function addSortFieldToTable(ByRef TABELA As ListObject, _
@@ -575,5 +661,7 @@ ColunaInexistente:
     checkColumnExists = False
     Exit Function
 End Function
+
+
 
 
