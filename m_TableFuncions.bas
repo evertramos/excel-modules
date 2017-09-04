@@ -5,7 +5,7 @@
 ' Possui diversas funções para trabalhar com tabelas
 ' pré-formatadas no Excel
 '
-' Versão: 0.6
+' Versão: 0.6.2
 '
 ' -------------------------------------------------------
 '
@@ -455,6 +455,51 @@ End Function
 ' Funções de Formatação
 ' -------------------------------------------------------
 
+Function formataAutoFit(ByVal NOME_TABELA As String, _
+                 ByVal NOME_COLUNA As String) As Boolean
+'
+' Formata a coluna com autofit
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+    Application.ScreenUpdating = False
+    On Error GoTo ErroFormatar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_COLUNA, TABELA.HeaderRowRange, 0)
+
+    'activateTable NOME_TABELA
+    
+    TABELA.ListColumns(COLUMN_NUMBER).Range.Columns.autoFit
+    formataAutoFit = True
+    
+Exit Function
+ErroFormatar:
+    MsgBox "Erro ao formatar os dados da coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - formataAutoFit - mod_TableFunctions"
+    formataAutoFit = False
+    Exit Function
+End Function
+
+Function formataNumero(ByVal NOME_TABELA As String, _
+                       ByVal NOME_COLUNA As String, _
+                       Optional ByRef FORMATO As String = "#,##0.00") As Boolean
+'
+' Formata a coluna como número
+'
+    Application.ScreenUpdating = False
+    On Error GoTo ErroFormatar
+    If selecionarDadosDaColuna(NOME_TABELA, NOME_COLUNA) = False Then
+        formataNumero = False
+        Exit Function
+    End If
+    Selection.NumberFormat = FORMATO
+    formataNumero = True
+    Exit Function
+
+ErroFormatar:
+    formataNumero = False
+    MsgBox "Erro ao formatar a coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - formataNumero - mod_TableFunctions"
+End Function
+
 Function converterTextoEmNumero(ByVal NOME_TABELA As String, _
                                     ByVal NOME_COLUNA As String)
 '
@@ -480,6 +525,28 @@ End Function
 ' -------------------------------------------------------
 ' Funções de Inserção, Edição e Exclusão de Dados
 ' -------------------------------------------------------
+
+Function Excluir_Linhas_em_Branco(ByVal NOME_TABELA As String)
+'
+' Deleta todos os dados de uma Tabela
+'
+Dim TABELA As ListObject
+    Application.ScreenUpdating = False
+    On Error GoTo ErroDeletar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    limparFiltroTabela NOME_TABELA
+    If TABELA.ListRows.count > 0 Then
+        On Error GoTo SemLinhaEmBranco
+        TABELA.DataBodyRange.SpecialCells(xlCellTypeBlanks).EntireRow.Delete
+    End If
+       
+Exit Function
+SemLinhaEmBranco:
+    Exit Function
+ErroDeletar:
+    MsgBox "Erro ao deletar todos os dados da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - deletarDadosTabela - Módulo: m_TableFunctions"
+
+End Function
 
 Function deletarDadosTabela(ByVal NOME_TABELA As String)
 '
@@ -727,3 +794,5 @@ ColunaInexistente:
     checkColumnExists = False
     Exit Function
 End Function
+
+
