@@ -5,7 +5,7 @@
 ' Possui diversas funções para trabalhar com tabelas
 ' pré-formatadas no Excel
 '
-' Versão: 0.5
+' Versão: 0.6
 '
 ' -------------------------------------------------------
 '
@@ -91,11 +91,11 @@ Function filtrarTabelaPorCampo(ByRef NOME_TABELA As String, _
                                 ByRef TEXTO_FILTRO As String, _
                                 Optional ByRef LIMPA_FILTRO As Boolean)
 '
-' Ordena Tabela por coluna
+' Filtra Tabela por coluna
 '
 Dim TABELA As ListObject
 Dim COLUMN_NUMBER As Integer
-Dim PRETECTED As Boolean
+    
     Application.ScreenUpdating = False
     On Error GoTo ErroFiltrar
         Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
@@ -119,6 +119,72 @@ ErroFiltrar:
     MsgBox "Erro ao filtrar a tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - filtrarTabelaPorCampo - Módulo: m_TableFunctions"
 
 End Function
+
+Function Filtrar_Tabela_Texto_Inicia_Com(ByRef NOME_TABELA As String, _
+                                         ByRef NOME_CAMPO As String, _
+                                         ByRef TEXTO_FILTRO As String, _
+                                         Optional ByRef LIMPA_FILTRO As Boolean = True)
+'
+' Filtra Tabela em coluna específica onde inicia-se com o texto TEXTO_FILTRO
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+    
+    Application.ScreenUpdating = False
+    On Error GoTo ErroFiltrar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_CAMPO, TABELA.HeaderRowRange, 0)
+    
+    If LIMPA_FILTRO Then
+        limparFiltroTabela NOME_TABELA
+    End If
+    
+    If ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).Visible <> xlVisible Then
+        activateTable NOME_TABELA
+    End If
+    
+    TABELA.ShowAutoFilter = True
+    TABELA.Range.AutoFilter Field:=COLUMN_NUMBER, Criteria1:=TEXTO_FILTRO & "*", Operator:=xlAnd
+    
+Exit Function
+ErroFiltrar:
+    MsgBox "Erro ao filtrar a tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - Filtrar_Tabela_Texto_Inicia_Com - Módulo: m_TableFunctions"
+
+End Function
+
+Function Filtrar_Tabela_Numero(ByRef NOME_TABELA As String, _
+                               ByRef NOME_CAMPO As String, _
+                               ByRef NUMERO_FILTRO As String, _
+                               Optional OPERACAO As String = ">=", _
+                               Optional ByRef LIMPA_FILTRO As Boolean = True)
+'
+' Filtra Tabela em coluna específica onde inicia-se com o texto TEXTO_FILTRO
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+    
+    Application.ScreenUpdating = False
+    On Error GoTo ErroFiltrar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_CAMPO, TABELA.HeaderRowRange, 0)
+    
+    If LIMPA_FILTRO Then
+        limparFiltroTabela NOME_TABELA
+    End If
+    
+    If ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).Visible <> xlVisible Then
+        activateTable NOME_TABELA
+    End If
+    
+    TABELA.ShowAutoFilter = True
+    TABELA.Range.AutoFilter Field:=COLUMN_NUMBER, Criteria1:=OPERACAO & NUMERO_FILTRO, Operator:=xlAnd
+    
+Exit Function
+ErroFiltrar:
+    MsgBox "Erro ao filtrar a tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - Filtrar_Tabela_Numero - Módulo: m_TableFunctions"
+
+End Function
+
 
 Function limparFiltroTabela(ByRef NOME_TABELA As String)
 '
@@ -661,7 +727,3 @@ ColunaInexistente:
     checkColumnExists = False
     Exit Function
 End Function
-
-
-
-
