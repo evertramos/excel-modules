@@ -5,7 +5,7 @@
 ' Possui diversas funções para trabalhar com tabelas
 ' pré-formatadas no Excel
 '
-' Versão: 0.6.2
+' Versão: 0.6.3
 '
 ' -------------------------------------------------------
 '
@@ -177,7 +177,9 @@ Dim COLUMN_NUMBER As Integer
     End If
     
     TABELA.ShowAutoFilter = True
-    TABELA.Range.AutoFilter Field:=COLUMN_NUMBER, Criteria1:=OPERACAO & NUMERO_FILTRO, Operator:=xlAnd
+    If NUMERO_FILTRO <> "" Then
+        TABELA.Range.AutoFilter Field:=COLUMN_NUMBER, Criteria1:=OPERACAO & NUMERO_FILTRO, Operator:=xlAnd
+    end if
     
 Exit Function
 ErroFiltrar:
