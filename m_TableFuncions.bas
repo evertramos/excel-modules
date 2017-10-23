@@ -5,7 +5,7 @@
 ' Possui diversas funções para trabalhar com tabelas
 ' pré-formatadas no Excel
 '
-' Versão: 0.6.3
+' Versão: 0.6.4
 '
 ' -------------------------------------------------------
 '
@@ -527,6 +527,30 @@ End Function
 ' -------------------------------------------------------
 ' Funções de Inserção, Edição e Exclusão de Dados
 ' -------------------------------------------------------
+Function Excluir_Linhas_Visiveis(ByVal NOME_TABELA As String)
+'
+' Deleta todos os dados de uma Tabela
+'
+Dim TABELA As ListObject
+    Application.ScreenUpdating = False
+    On Error GoTo ErroDeletar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    If TABELA.ListRows.count > 0 Then
+        On Error GoTo SemLinhaEmBranco
+        
+        activateTable NOME_TABELA
+        
+        TABELA.DataBodyRange.SpecialCells(xlCellTypeVisible).Select
+        TABELA.DataBodyRange.EntireRow.Delete
+    End If
+       
+Exit Function
+SemLinhaEmBranco:
+    Exit Function
+ErroDeletar:
+    MsgBox "Erro ao deletar as linhas visíveis da tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - deletarDadosTabela - Módulo: m_TableFunctions"
+
+End Function
 
 Function Excluir_Linhas_em_Branco(ByVal NOME_TABELA As String)
 '
