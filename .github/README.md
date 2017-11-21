@@ -21,7 +21,7 @@ Excel Modules
  O nome das funções devem iniciar com letra maiúscula descrevendo literalmente o que a função irá retornar/executar.
  
  Exemplo:
- - Ordenar_Tabelas_Por_Campos - Função para ordernar uma tabela do Excel por determinado campo
+ - Ordenar_Tabela_Por_Campo - Função para ordernar uma tabela do Excel por determinado campo
  
  
  
