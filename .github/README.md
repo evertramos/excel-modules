@@ -36,7 +36,7 @@ Dim TABELA As ListObject
 
     ' Remove
     Application.ScreenUpdating = False
-    On Error GoTo ErroOrdenar
+    On Error GoTo TrataErro
         ' Busca a tabela conforme nome informado
         Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
     
@@ -57,7 +57,7 @@ Dim TABELA As ListObject
     End With
     
 Exit Function
-ErroOrdenar:
+TrataErro:
     MsgBox "Erro ao ordendar a tabela: '" & NOME_TABELA & "'" & vbNewLine & _
         "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
         "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
