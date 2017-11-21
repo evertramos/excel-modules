@@ -77,7 +77,7 @@ Dim FIELD_NAME As Variant
     If IsArray(NOMES_CAMPOS) Then
         For Each FIELD_NAME In NOMES_CAMPOS
             ' Insere o filtro na tabela
-            TABELA.Sort.SortFields.Add Key:=Range(NOME_TABELA & "[[#All],[" & NOME_CAMPO & "]]") _
+            TABELA.Sort.SortFields.Add Key:=Range(NOME_TABELA & "[[#All],[" & FIELD_NAME & "]]") _
                 , SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
         Next
     Else
