@@ -34,7 +34,7 @@ Function Ordenar_Tabela_Por_Campo(ByRef NOME_TABELA As String, _
 '
 Dim TABELA As ListObject
 
-    ' Remove
+    ' Remove visualização em tela
     Application.ScreenUpdating = False
     On Error GoTo TrataErro
         ' Busca a tabela conforme nome informado
