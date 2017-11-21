@@ -102,3 +102,123 @@ TrataErro:
         "Erro - " & "Ordenar_Tabela_Por_Multiplos_Campos"
 
 End Function
+
+' -------------------------------------------------------
+' Funções de Filtros nas Tabelas
+' -------------------------------------------------------
+Function Limpar_Filtro_Tabela(ByRef NOME_TABELA As String)
+'
+' Limpa todos os filtros de uma Tabela
+'
+Dim TABELA As ListObject
+
+    ' Remove visualização em tela
+    Application.ScreenUpdating = False
+    
+    On Error GoTo TabelaInexistente
+    
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    
+    TABELA.ShowAutoFilter = True
+    
+    If TABELA.AutoFilter.FilterMode Then
+        TABELA.AutoFilter.ShowAllData
+    End If
+    
+Exit Function
+TabelaInexistente:
+    MsgBox "Erro ao limpar filtro da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente foi excluída indevidamente", vbCritical, "Erro - limparFiltroTabela - Módulo: m_TableFunctions"
+
+End Function
+
+Function Filtrar_Tabela_Por_Campo(ByRef NOME_TABELA As String, _
+                                  ByRef NOME_CAMPO As String, _
+                                  ByRef TEXTO_FILTRO As String, _
+                                  Optional ByRef LIMPA_FILTRO As Boolean = True)
+'
+' Filtra Tabela por coluna (NOME_CAMPO) conforme texto informado (TEXTO_FILTRO)
+' Limpa filtro por padrão
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+Dim OCULTAR_PLANILHA_ATIVADA As Boolean
+    
+    ' Remove visualização em tela
+    Application.ScreenUpdating = False
+    On Error GoTo ErroFiltrar
+        ' Busca a tabela conforme nome informado
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    
+    ' Busca o número da coluna conforme campo informado
+    COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_CAMPO, TABELA.HeaderRowRange, 0)
+    
+    ' Verifica se deve limpar o filtro
+    If LIMPA_FILTRO Then
+        Limpar_Filtro_Tabela NOME_TABELA
+    End If
+    
+    ' Ativa a planilha caso esteja oculta
+    If ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).Visible <> xlVisible Then
+        OCULTAR_PLANILHA_ATIVADA = Ativar_Tabela(NOME_TABELA)
+    End If
+    
+    ' Aplicar opção de filtros
+    TABELA.ShowAutoFilter = True
+    
+    ' Filtrar tabela conforme texto do filtro
+    TABELA.Range.AutoFilter Field:=COLUMN_NUMBER, Criteria1:=TEXTO_FILTRO
+
+    ' Caso a tabela tenha sido ativada nesta função
+    If OCULTAR_PLANILHA_ATIVADA Then
+        Ocultar_Planilha NOME_TABELA
+    End If
+    
+Exit Function
+ErroFiltrar:
+    MsgBox "Erro ao ordendar a tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Ordenar_Tabela_Por_Multiplos_Campos"
+    MsgBox "Erro ao filtrar a tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - filtrarTabelaPorCampo - Módulo: m_TableFunctions"
+
+End Function
+
+' ---------------------------------------------------
+' Funções auxiliares
+' ---------------------------------------------------
+Function Ativar_Tabela(ByVal NOME_TABELA As String) As Boolean
+'
+' Ativa a planilha da tabela para seleção
+'
+
+    ' Remove visualização em tela
+    Application.ScreenUpdating = False
+
+    ' Verifica se a Aba que consta a tabela está oculta
+    If ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).Visible <> xlSheetVisible Then
+        ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).Visible = xlSheetVisible
+        Ativar_Tabela = True
+    Else
+        Ativar_Tabela = False
+    End If
+    
+    ' Ativa aba da Tabela
+    ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).Activate
+
+End Function
+
+Function Ocultar_Planilha(ByVal NOME_TABELA As String)
+'
+' Desativa a planilha da tabela para seleção
+'
+    
+    ' Remove visualização em tela
+    Application.ScreenUpdating = False
+    
+    ' Oculta Aba da Tabela
+    If ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).Visible = xlSheetVisible Then
+        ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).Visible = xlVeryHidden
+    End If
+    
+End Function
