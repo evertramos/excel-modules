@@ -8,7 +8,7 @@
 ' Desenvolvido e distribuido por:
 '   https://excelplay.com.br
 '
-' Versão: 0.3
+' Versão: 0.4
 '
 ' -------------------------------------------------------
 
@@ -331,6 +331,81 @@ ErroFiltrar:
         "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
         "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
         "Erro - " & "Filtrar_Tabela_Por_Campo"
+
+End Function
+
+Function Filtrar_Tabela_Texto_Inicia_Com(ByRef NOME_TABELA As String, _
+                                         ByRef NOME_CAMPO As String, _
+                                         ByRef TEXTO_FILTRO As String, _
+                                         Optional ByRef LIMPA_FILTRO As Boolean = True)
+'
+' Filtra Tabela em coluna específica onde inicia-se com o texto TEXTO_FILTRO
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+    
+    Application.ScreenUpdating = False
+    On Error GoTo ErroFiltrar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_CAMPO, TABELA.HeaderRowRange, 0)
+    
+    If LIMPA_FILTRO Then
+        Limpar_Filtro_Tabela NOME_TABELA
+    End If
+    
+    If ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).Visible <> xlVisible Then
+        Ativar_Tabela NOME_TABELA
+    End If
+    
+    TABELA.ShowAutoFilter = True
+    TABELA.Range.AutoFilter Field:=COLUMN_NUMBER, Criteria1:=TEXTO_FILTRO & "*", Operator:=xlAnd
+    
+    Exit Function
+    
+ErroFiltrar:
+    MsgBox "Erro ao filtrar a tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Filtrar_Tabela_Texto_Inicia_Com"
+
+End Function
+
+Function Filtrar_Tabela_Numero(ByRef NOME_TABELA As String, _
+                               ByRef NOME_CAMPO As String, _
+                               ByRef NUMERO_FILTRO As String, _
+                               Optional OPERACAO As String = ">=", _
+                               Optional ByRef LIMPA_FILTRO As Boolean = True)
+'
+' Filtra Tabela em coluna específica onde inicia-se com o texto TEXTO_FILTRO
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+    
+    Application.ScreenUpdating = False
+    On Error GoTo ErroFiltrar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_CAMPO, TABELA.HeaderRowRange, 0)
+    
+    If LIMPA_FILTRO Then
+        Limpar_Filtro_Tabela NOME_TABELA
+    End If
+    
+    If ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).Visible <> xlVisible Then
+        Ativar_Tabela NOME_TABELA
+    End If
+    
+    TABELA.ShowAutoFilter = True
+    If NUMERO_FILTRO <> "" Then
+        TABELA.Range.AutoFilter Field:=COLUMN_NUMBER, Criteria1:=OPERACAO & NUMERO_FILTRO, Operator:=xlAnd
+    End If
+    
+    Exit Function
+    
+ErroFiltrar:
+    MsgBox "Erro ao filtrar a tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Filtrar_Tabela_Numero"
 
 End Function
 ' Fim Funções de filtro
