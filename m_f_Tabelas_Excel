@@ -8,12 +8,130 @@
 ' Desenvolvido e distribuido por:
 '   https://excelplay.com.br
 '
-' Versão: 0.1
+' Versão: 0.2
 '
 ' -------------------------------------------------------
 
 ' Opção para forçar a necessidad de declarar variáveis
 Option Explicit
+
+' -------------------------------------------------------
+' Funções de Seleção de Dados
+' -------------------------------------------------------
+Function Selecionar_Dados_Coluna(ByVal NOME_TABELA As String, _
+                                 ByVal NOME_COLUNA As String, _
+                                 Optional ByVal TODOS_OS_DADOS As Boolean = False) As Boolean
+'
+' Seleciona dados de uma coluna
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+    Application.ScreenUpdating = False
+    On Error GoTo ErroSelecionar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_COLUNA, TABELA.HeaderRowRange, 0)
+
+    Ativar_Tabela NOME_TABELA
+    
+    If TODOS_OS_DADOS Then
+        TABELA.ListColumns(COLUMN_NUMBER).DataBodyRange.Select
+    Else
+        On Error GoTo SemDados
+            TABELA.ListColumns(COLUMN_NUMBER).DataBodyRange.SpecialCells(xlCellTypeVisible).Select
+    End If
+    Selecionar_Dados_Coluna = True
+    
+    Exit Function
+
+SemDados:
+    Selecionar_Dados_Coluna = False
+    Exit Function
+
+ErroSelecionar:
+    Selecionar_Dados_Coluna = False
+    MsgBox "Erro ao selecionar os dados da coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Selecionar_Dados_Coluna"
+    Exit Function
+End Function
+
+Function Selecionar_Dados_Tabela(ByVal NOME_TABELA As String, _
+                                 Optional ByVal TODOS_OS_DADOS As Boolean = False) As Boolean
+'
+' Seleciona todos os dados de uma coluna
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+    
+    Application.ScreenUpdating = False
+    
+    On Error GoTo ErroSelecionar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+   
+    On Error GoTo SemDados
+        Ativar_Tabela NOME_TABELA
+    
+    If TODOS_OS_DADOS Then
+        TABELA.DataBodyRange.Select
+    Else
+        TABELA.DataBodyRange.SpecialCells(xlCellTypeVisible).Select
+    End If
+    Selecionar_Dados_Tabela = True
+    
+    Exit Function
+    
+SemDados:
+    Selecionar_Dados_Tabela = False
+    Exit Function
+
+ErroSelecionar:
+    Selecionar_Dados_Tabela = False
+    MsgBox "Erro ao selecionar os dados da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Selecionar_Dados_Tabela"
+    Exit Function
+End Function
+
+Function Selecionar_Linha_Tabela(ByVal NOME_TABELA As String, _
+                                 ByVal LINHA_TABELA As Integer, _
+                                 Optional ByVal DIF_LINHA As Integer = 0, _
+                                 Optional ByVal LINHA_INTEIRA As Boolean = False) As Boolean
+'
+' Seleciona dados de uma coluna
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+    Application.ScreenUpdating = False
+    On Error GoTo ErroSelecionar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+   
+    On Error GoTo SemDados
+        Ativar_Tabela NOME_TABELA
+        
+        If LINHA_INTEIRA Then
+            TABELA.ListRows(LINHA_TABELA + DIF_LINHA).Range.Select
+        Else
+            TABELA.ListRows(LINHA_TABELA + DIF_LINHA).Range(, 1).Select
+        End If
+        Selecionar_Linha_Tabela = True
+    
+    Exit Function
+
+SemDados:
+    Selecionar_Linha_Tabela = False
+    Exit Function
+
+ErroSelecionar:
+    Selecionar_Linha_Tabela = False
+    MsgBox "Erro ao selecionar a linha: '" & LINHA_TABELA & "'" & " da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Selecionar_Linha_Tabela"
+    Exit Function
+End Function
+' Fim Funções de Seleção
 
 ' -------------------------------------------------------
 ' Funções de Ordenação de Dados em Tabela
@@ -47,7 +165,8 @@ Dim TABELA As ListObject
         .Apply
     End With
     
-Exit Function
+    Exit Function
+
 TrataErro:
     MsgBox "Erro ao ordendar a tabela: '" & NOME_TABELA & "'" & vbNewLine & _
         "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
@@ -94,7 +213,8 @@ Dim FIELD_NAME As Variant
         .Apply
     End With
     
-Exit Function
+    Exit Function
+    
 TrataErro:
     MsgBox "Erro ao ordendar a tabela: '" & NOME_TABELA & "'" & vbNewLine & _
         "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
@@ -102,6 +222,7 @@ TrataErro:
         "Erro - " & "Ordenar_Tabela_Por_Multiplos_Campos"
 
 End Function
+' Fim Funções de Ordenação
 
 ' -------------------------------------------------------
 ' Funções de Filtros nas Tabelas
@@ -125,10 +246,13 @@ Dim TABELA As ListObject
         TABELA.AutoFilter.ShowAllData
     End If
     
-Exit Function
+    Exit Function
+
 TabelaInexistente:
     MsgBox "Erro ao limpar filtro da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
-        "Provavelmente foi excluída indevidamente", vbCritical, "Erro - limparFiltroTabela - Módulo: m_TableFunctions"
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Limpar_Filtro_Tabela"
 
 End Function
 
@@ -174,15 +298,550 @@ Dim OCULTAR_PLANILHA_ATIVADA As Boolean
         Ocultar_Planilha NOME_TABELA
     End If
     
-Exit Function
+    Exit Function
+
 ErroFiltrar:
-    MsgBox "Erro ao ordendar a tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+    MsgBox "Erro ao filtrar a tabela: '" & NOME_TABELA & "'" & vbNewLine & _
         "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
         "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
-        "Erro - " & "Ordenar_Tabela_Por_Multiplos_Campos"
-    MsgBox "Erro ao filtrar a tabela: '" & NOME_TABELA & "'", vbCritical, "Erro - filtrarTabelaPorCampo - Módulo: m_TableFunctions"
+        "Erro - " & "Filtrar_Tabela_Por_Campo"
 
 End Function
+' Fim Funções de filtro
+
+' -------------------------------------------------------
+' Funções de Exclusão de Dados
+' -------------------------------------------------------
+Function Excluir_Linhas_Visiveis(ByVal NOME_TABELA As String)
+'
+' Deleta todos os dados de uma Tabela
+'
+Dim TABELA As ListObject
+    Application.ScreenUpdating = False
+    On Error GoTo ErroDeletar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    If TABELA.ListRows.COUNT > 0 Then
+        On Error GoTo SemLinhaEmBranco
+        
+        Ativar_Tabela NOME_TABELA
+        
+        TABELA.DataBodyRange.SpecialCells(xlCellTypeVisible).Select
+        TABELA.DataBodyRange.EntireRow.Delete
+    End If
+       
+    Exit Function
+
+SemLinhaEmBranco:
+    Exit Function
+    
+ErroDeletar:
+    MsgBox "Erro ao deletar as linhas visíveis da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Excluir_Linhas_Visiveis"
+
+End Function
+
+Function Excluir_Linhas_em_Branco(ByVal NOME_TABELA As String)
+'
+' Deleta todos os dados de uma Tabela
+'
+Dim TABELA As ListObject
+    Application.ScreenUpdating = False
+    On Error GoTo ErroDeletar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    Limpar_Filtro_Tabela NOME_TABELA
+    If TABELA.ListRows.COUNT > 0 Then
+        On Error GoTo SemLinhaEmBranco
+        TABELA.DataBodyRange.SpecialCells(xlCellTypeBlanks).EntireRow.Delete
+    End If
+       
+    Exit Function
+
+SemLinhaEmBranco:
+    Exit Function
+
+ErroDeletar:
+    MsgBox "Erro ao deletar todos os dados da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Excluir_Linhas_em_Branco"
+
+End Function
+
+Function Excluir_Todos_Dados_Tabela(ByVal NOME_TABELA As String)
+'
+' Deleta todos os dados de uma Tabela
+'
+Dim TABELA As ListObject
+    Application.ScreenUpdating = False
+    On Error GoTo ErroDeletar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    Limpar_Filtro_Tabela NOME_TABELA
+    If TABELA.ListRows.COUNT > 0 Then
+        TABELA.DataBodyRange.Delete
+    End If
+       
+    Exit Function
+    
+ErroDeletar:
+    MsgBox "Erro ao deletar todos os dados da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Excluir_Todos_Dados_Tabela"
+
+End Function
+' Fim Funções de Exclusão de Dados
+
+' -------------------------------------------------------
+' Funções de Inclusão de Dados
+' -------------------------------------------------------
+Function Inserir_Formula_Coluna(ByVal NOME_TABELA As String, _
+                                ByVal NOME_COLUNA As String, _
+                                ByVal FORMULA_ As String) As Boolean
+'
+' Insere uma fórmula (string) em um determinada coluna
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+    Application.ScreenUpdating = False
+    On Error GoTo ErroInserir
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_COLUNA, TABELA.HeaderRowRange, 0)
+    Limpar_Filtro_Tabela NOME_TABELA
+    TABELA.ListColumns(COLUMN_NUMBER).DataBodyRange.Value = FORMULA_
+    
+    Inserir_Formula_Coluna = True
+    ' Modo simples
+    'Range(NOME_TABELA & "[" & NOME_COLUNA & "]").value = FORMULA_
+        
+    Exit Function
+    
+ErroInserir:
+    Inserir_Formula_Coluna = False
+    MsgBox "Erro ao inserir fórmula na coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Inserir_Formula_Coluna"
+        
+End Function
+
+Function Inserir_Dado_Tabela(ByVal NOME_TABELA As String, _
+                             ByVal NOME_COLUNA As String, _
+                             ByVal DADO As Variant, _
+                             Optional LINHA_DESTINO As Integer = 0) As Integer
+'
+' Insere dados em uma tabela
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+Dim NEW_ROW As Integer
+Dim FIELD_NAME As Variant
+
+    Application.ScreenUpdating = False
+    On Error GoTo ErroInserir
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    If NOME_COLUNA <> "" Then
+        COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_COLUNA, TABELA.HeaderRowRange, 0)
+    Else
+        COLUMN_NUMBER = 1
+    End If
+    
+    If Not LINHA_DESTINO > 0 Then
+        NEW_ROW = Inserir_Nova_Linha(NOME_TABELA)
+    Else
+        NEW_ROW = LINHA_DESTINO
+    End If
+    
+    ' Retorna a primeira linha inserida
+    Inserir_Dado_Tabela = NEW_ROW
+    
+    If IsArray(DADO) Then
+        For Each FIELD_NAME In DADO
+            TABELA.Range.Cells(NEW_ROW, COLUMN_NUMBER).Value = FIELD_NAME
+            'NEW_ROW = Inserir_Nova_Linha(NOME_TABELA)
+            NEW_ROW = NEW_ROW + 1
+        Next
+    Else
+        TABELA.Range.Cells(NEW_ROW, COLUMN_NUMBER).Value = DADO
+    End If
+       
+    Exit Function
+    
+ErroInserir:
+    MsgBox "Erro ao inserir dados na coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Inserir_Dado_Tabela"
+        
+End Function
+' Fim Funções de Inclusão de Dados
+
+' -------------------------------------------------------
+' Funções de Retorno de Dados
+' -------------------------------------------------------
+Function Retorna_Nome_Planilha(ByVal NOME_TABELA As String) As String
+'
+' Retorna Nome da planilha com determinada Tabela
+'
+Dim TABELA As ListObject
+    Application.ScreenUpdating = False
+    On Error GoTo Erro
+        Retorna_Nome_Planilha = Range(NOME_TABELA).Parent.Name
+
+    Exit Function
+    
+Erro:
+    Retorna_Nome_Planilha = ""
+    Exit Function
+    
+End Function
+
+Function Retornar_Numero_Coluna(ByVal NOME_TABELA As String, _
+                                ByVal NOME_COLUNA As String) As Integer
+'
+' Retorna o número da coluna de um determinado campo (cabeçalho) de uma tabela
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+    Application.ScreenUpdating = False
+    On Error GoTo ErroRetornar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_COLUNA, TABELA.HeaderRowRange, 0)
+    Retornar_Numero_Coluna = TABELA.ListColumns(COLUMN_NUMBER).Range.Column
+        
+    Exit Function
+    
+ErroRetornar:
+    MsgBox "Erro buscar número da coluna na tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Retornar_Numero_Coluna"
+
+End Function
+
+Function Retornar_Qtd_Linhas_Tabela(ByVal NOME_TABELA As String, _
+                                    Optional ByVal CONSIDERA_FILTRO As Boolean = True) As Integer
+'
+' Retorna a quantidade de linhas de uma tabela, levando em consideração o filtro atual aplicado
+'
+Dim TABELA As ListObject
+    Application.ScreenUpdating = False
+    On Error GoTo ErroRetornar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    
+    If CONSIDERA_FILTRO Then
+        Retornar_Qtd_Linhas_Tabela = TABELA.DataBodyRange.Columns(1).SpecialCells(xlCellTypeVisible).COUNT
+    Else
+        Retornar_Qtd_Linhas_Tabela = TABELA.DataBodyRange.Rows.COUNT
+    End If
+        
+    Exit Function
+    
+ErroRetornar:
+    MsgBox "Erro ao buscar a quantidade de linhas da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Retornar_Qtd_Linhas_Tabela"
+
+End Function
+
+Function Retornar_Qtd_Linhas_Coluna(ByVal NOME_TABELA As String, _
+                                    ByVal NOME_COLUNA As String, _
+                                    Optional ByVal SOMENTE_NAO_VAZIAS As Boolean = True) As Integer
+'
+' Retorna a quantidade de linhas de uma tabela, levando em consideração o filtro atual aplicado
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+    Application.ScreenUpdating = False
+    On Error GoTo ErroRetornar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_COLUNA, TABELA.HeaderRowRange, 0)
+    
+    If SOMENTE_NAO_VAZIAS Then
+        Retornar_Qtd_Linhas_Coluna = TABELA.DataBodyRange.Columns(COLUMN_NUMBER).SpecialCells(xlCellTypeConstants).COUNT
+    Else
+        'Retornar_Qtd_Linhas_Coluna = TABELA.DataBodyRange.Columns(COLUMN_NUMBER).Rows.COUNT
+        Retornar_Qtd_Linhas_Coluna = TABELA.DataBodyRange.Rows.COUNT
+    End If
+        
+    Exit Function
+    
+ErroRetornar:
+    MsgBox "Erro ao buscar a quantidade de linhas da coluna: '" & NOME_COLUNA & "da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Retornar_Qtd_Linhas_Coluna"
+
+End Function
+
+Function Retornar_Nome_Todas_Tabelas() As Variant
+'
+' Retorna o número da tabelas da planilha
+'
+Dim PLANILHA As Worksheet
+Dim TABELA As ListObject
+Dim NOMES As Variant
+Dim i As Integer
+    
+    Application.ScreenUpdating = False
+    
+    ReDim NOMES(1 To Retornar_Qtd_Tabelas)
+    
+    On Error GoTo ErroRetornar
+    i = 1
+    'Loop em todas as planilhas
+    For Each PLANILHA In ThisWorkbook.Worksheets
+        For Each TABELA In PLANILHA.ListObjects
+            NOMES(i) = TABELA.Name
+            i = i + 1
+        Next
+    Next
+    Retornar_Nome_Todas_Tabelas = NOMES
+    
+    Exit Function
+    
+ErroRetornar:
+    MsgBox "Erro buscar o nome das tabelas da planilha." & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Retornar_Nome_Todas_Tabelas"
+
+End Function
+
+Function Retornar_Qtd_Tabelas() As Integer
+'
+' Retorna o número da tabelas da planilha
+'
+Dim PLANILHA As Worksheet
+Dim TABELA As ListObject
+Dim i As Integer
+    
+    Application.ScreenUpdating = False
+    
+    On Error GoTo ErroRetornar
+    i = 0
+    'Loop em todas as planilhas
+    For Each PLANILHA In ThisWorkbook.Worksheets
+        For Each TABELA In PLANILHA.ListObjects
+            i = i + 1
+        Next
+    Next
+    Retornar_Qtd_Tabelas = i
+    
+    Exit Function
+ 
+ErroRetornar:
+    MsgBox "Erro buscar a quantidade de tabelas da planilha." & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Retornar_Qtd_Tabelas"
+
+End Function
+' Fim Funções de Retorno de Dados
+
+' -------------------------------------------------------
+' Funções de Formatação de Dados na Tabela
+' -------------------------------------------------------
+
+Function Formatar_AutoFit(ByVal NOME_TABELA As String, _
+                          ByVal NOME_COLUNA As String) As Boolean
+'
+' Formata a coluna com autofit
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+    Application.ScreenUpdating = False
+    On Error GoTo ErroFormatar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_COLUNA, TABELA.HeaderRowRange, 0)
+
+    'Ativar_Tabela NOME_TABELA
+    
+    TABELA.ListColumns(COLUMN_NUMBER).Range.Columns.AutoFit
+    Formatar_AutoFit = True
+    
+    Exit Function
+    
+ErroFormatar:
+    Formatar_AutoFit = False
+    MsgBox "Erro ao formatar os dados da coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Formatar_AutoFit"
+        
+End Function
+
+Function Formatar_Numero(ByVal NOME_TABELA As String, _
+                         ByVal NOME_COLUNA As String, _
+                         Optional ByRef FORMATO As String = "#,##0.00") As Boolean
+'
+' Formata a coluna como número
+'
+    Application.ScreenUpdating = False
+    On Error GoTo ErroFormatar
+    If Selecionar_Dados_Coluna(NOME_TABELA, NOME_COLUNA) = False Then
+        Formatar_Numero = False
+        Exit Function
+    End If
+    Selection.NumberFormat = FORMATO
+    Formatar_Numero = True
+
+    Exit Function
+
+ErroFormatar:
+    Formatar_Numero = False
+    MsgBox "Erro ao formatar a coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Formatar_AutoFit"
+        
+End Function
+
+Function Converter_Texto_Em_Numero(ByVal NOME_TABELA As String, _
+                                   ByVal NOME_COLUNA As String)
+'
+' Converte os dados de determinada Coluna em determinada Tabela em número
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+    Application.ScreenUpdating = False
+    On Error GoTo ErroConverter
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_COLUNA, TABELA.HeaderRowRange, 0)
+    TABELA.ListColumns(COLUMN_NUMBER).DataBodyRange = TABELA.ListColumns(COLUMN_NUMBER).DataBodyRange.Value
+    
+    ' Modo simples
+    'Range(NOME_TABELA & "[" & NOME_COLUNA & "]") = Range(NOME_TABELA & "[" & NOME_COLUNA & "]").Value
+        
+    Exit Function
+
+ErroConverter:
+    MsgBox "Erro buscar converter os dados da coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Converter_Texto_Em_Numero"
+
+End Function
+' Fim Funções de Formatação de Dados
+
+' -------------------------------------------------------
+' Funções de Alterações na Estrutura da Tabela
+' -------------------------------------------------------
+Function Inserir_Nova_Coluna(ByVal NOME_TABELA As String, _
+                             ByVal NOME_COLUNA As String) As Integer
+'
+' Insere uma coluna na tabela
+'
+Dim TABELA As ListObject
+
+    Application.ScreenUpdating = False
+    On Error GoTo ErroInserir
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    If Verifica_Coluna_Existe(NOME_TABELA, NOME_COLUNA) = False Then
+        TABELA.ListColumns.Add.Name = NOME_COLUNA
+    End If
+    Inserir_Nova_Coluna = Retornar_Numero_Coluna(NOME_TABELA, NOME_COLUNA)
+    
+    Exit Function
+
+ErroInserir:
+    Inserir_Nova_Coluna = 0
+    MsgBox "Erro ao inserir a coluna: '" & NOME_COLUNA & "' na tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Inserir_Nova_Coluna"
+    
+End Function
+
+Function Inserir_Nova_Linha(ByVal NOME_TABELA As String, _
+                            Optional POSITION_ As Integer, _
+                            Optional ALWAYS_INSERT_ As Boolean = True) As Integer
+'
+' Inserir nova linha em tabela
+'
+Dim TABELA As ListObject
+Dim NEW_ROW As Object
+    Application.ScreenUpdating = False
+    On Error GoTo ErroInserir
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+        On Error GoTo SemDados
+            ' Ativa Planilhapara usar o Select
+            Ativar_Tabela NOME_TABELA
+            
+        TABELA.DataBodyRange.Select
+        
+        If POSITION_ Then
+            Set NEW_ROW = TABELA.ListRows.Add(Position:=POSITION_, AlwaysInsert:=ALWAYS_INSERT_)
+        Else
+            Set NEW_ROW = TABELA.ListRows.Add(AlwaysInsert:=ALWAYS_INSERT_)
+        End If
+         Inserir_Nova_Linha = NEW_ROW.Range.Row
+
+    Exit Function
+
+SemDados:
+    Inserir_Nova_Linha = TABELA.Range.Rows.COUNT
+    Exit Function
+    
+ErroInserir:
+    MsgBox "Erro ao inserir nova linha na tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Inserir_Nova_Linha"
+        
+End Function
+' Fim Funções de Alteração de Estrutura
+
+' -------------------------------------------------------
+' Funções de Verificação
+' -------------------------------------------------------
+Function Verifica_Tabela_Existe(ByVal NOME_TABELA As String) As Boolean
+'
+' Inserir nova linha em tabela
+'
+Dim TABELA As ListObject
+    Application.ScreenUpdating = False
+    On Error GoTo Erro
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    Verifica_Tabela_Existe = True
+    
+    Exit Function
+
+Erro:
+    Verifica_Tabela_Existe = True
+
+End Function
+
+Private Function Verifica_Coluna_Existe(ByVal NOME_TABELA As String, _
+                                        ByVal NOME_COLUNA As String) As Boolean
+'
+' Verifica se determinada columa existe em uma tabela
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+    Application.ScreenUpdating = False
+    On Error GoTo ErroVerifica
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    
+    On Error GoTo ColunaInexistente
+        COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_COLUNA, TABELA.HeaderRowRange, 0)
+    
+    Verifica_Coluna_Existe = True
+        
+    Exit Function
+    
+ErroVerifica:
+    Verifica_Coluna_Existe = False
+    Exit Function
+    
+ColunaInexistente:
+    Err.Clear
+    Verifica_Coluna_Existe = False
+    
+End Function
+' Fim Funções de Verificação
 
 ' ---------------------------------------------------
 ' Funções auxiliares
@@ -222,3 +881,4 @@ Function Ocultar_Planilha(ByVal NOME_TABELA As String)
     End If
     
 End Function
+' Fim Funções Auxiliares
