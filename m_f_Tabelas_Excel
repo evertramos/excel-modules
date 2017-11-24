@@ -8,7 +8,7 @@
 ' Desenvolvido e distribuido por:
 '   https://excelplay.com.br
 '
-' Versão: 0.4
+' Versão: 0.5
 '
 ' -------------------------------------------------------
 
@@ -470,7 +470,8 @@ ErroDeletar:
 
 End Function
 
-Function Excluir_Todos_Dados_Tabela(ByVal NOME_TABELA As String)
+Function Excluir_Todos_Dados_Tabela(ByVal NOME_TABELA As String, _
+                                    Optional SELECIONA_PRIMEIRA_LINHA As Boolean = True)
 '
 ' Deleta todos os dados de uma Tabela
 '
@@ -482,7 +483,11 @@ Dim TABELA As ListObject
     If TABELA.ListRows.COUNT > 0 Then
         TABELA.DataBodyRange.Delete
     End If
-       
+           
+    If SELECIONA_PRIMEIRA_LINHA Then
+        Selecionar_Primeira_Celula_Tabela NOME_TABELA
+    End If
+    
     Exit Function
     
 ErroDeletar:
