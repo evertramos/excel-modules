@@ -8,7 +8,7 @@
 ' Desenvolvido e distribuido por:
 '   https://excelplay.com.br
 '
-' Versão: 0.2
+' Versão: 0.3
 '
 ' -------------------------------------------------------
 
@@ -129,7 +129,33 @@ ErroSelecionar:
         "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
         "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
         "Erro - " & "Selecionar_Linha_Tabela"
+    
+End Function
+
+Function Selecionar_Primeira_Celula_Tabela(ByVal NOME_TABELA As String) As Boolean
+'
+' Seleciona primeira célula de uma tabela
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+    Application.ScreenUpdating = False
+    On Error GoTo ErroSelecionar
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+   
+        Ativar_Tabela NOME_TABELA
+        
+        TABELA.Range.Cells(2, 1).Activate
+        Selecionar_Primeira_Celula_Tabela = True
+    
     Exit Function
+
+ErroSelecionar:
+    Selecionar_Primeira_Celula_Tabela = False
+    MsgBox "Erro ao selecionar a primeira linha da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Selecionar_Primeira_Celula_Tabela"
+    
 End Function
 ' Fim Funções de Seleção
 
@@ -644,7 +670,6 @@ End Function
 ' -------------------------------------------------------
 ' Funções de Formatação de Dados na Tabela
 ' -------------------------------------------------------
-
 Function Formatar_AutoFit(ByVal NOME_TABELA As String, _
                           ByVal NOME_COLUNA As String) As Boolean
 '
@@ -698,7 +723,11 @@ ErroFormatar:
         "Erro - " & "Formatar_AutoFit"
         
 End Function
+' Fim Funções de Formatação de Dados
 
+' -------------------------------------------------------
+' Funções de Conversão de dados
+' -------------------------------------------------------
 Function Converter_Texto_Em_Numero(ByVal NOME_TABELA As String, _
                                    ByVal NOME_COLUNA As String)
 '
@@ -724,7 +753,33 @@ ErroConverter:
         "Erro - " & "Converter_Texto_Em_Numero"
 
 End Function
-' Fim Funções de Formatação de Dados
+
+Function Converter_Formula_Em_Texto(ByVal NOME_TABELA As String, _
+                                    ByVal NOME_COLUNA As String)
+'
+' Converte os dados de determinada Coluna em Texto
+'
+Dim TABELA As ListObject
+Dim COLUMN_NUMBER As Integer
+    Application.ScreenUpdating = False
+    On Error GoTo ErroConverter
+        Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
+    COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_COLUNA, TABELA.HeaderRowRange, 0)
+    TABELA.ListColumns(COLUMN_NUMBER).DataBodyRange = TABELA.ListColumns(COLUMN_NUMBER).DataBodyRange.Value
+    
+    ' Modo simples
+    'Range(NOME_TABELA & "[" & NOME_COLUNA & "]") = Range(NOME_TABELA & "[" & NOME_COLUNA & "]").Value
+        
+    Exit Function
+
+ErroConverter:
+    MsgBox "Erro buscar converter os dados da coluna: '" & NOME_COLUNA & "' da tabela: '" & NOME_TABELA & "'" & vbNewLine & _
+        "Provavelmente esta tabela foi excluída indevidamente" & vbNewLine & vbNewLine & _
+        "Módulo: " & Application.VBE.ActiveCodePane.CodeModule.Name, vbCritical, _
+        "Erro - " & "Converter_Texto_Em_Numero"
+
+End Function
+' Fim Funções de Conversão de Dados
 
 ' -------------------------------------------------------
 ' Funções de Alterações na Estrutura da Tabela
