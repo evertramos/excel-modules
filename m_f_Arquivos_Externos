@@ -1,0 +1,66 @@
+ -------------------------------------------------------
+'
+' Módulo para trabalhar com Arquivos Externos
+'
+' Desenvolvido e distribuido por:
+'   https://excelplay.com.br
+'
+' Versão: 0.1
+'
+' -------------------------------------------------------
+
+' Opção para forçar a necessidad de declarar variáveis
+Option Explicit
+
+' Variáveis privadas deste módulo
+Private NOME_ARQUIVO_ATUAL As String
+Private NOME_ARQUIVO_ABRIR As String
+Private NOME_ARQUIVO_ABERTO As String
+
+Function Buscar_Arquivo_Externo(Optional ByRef NOME_TIPO_ARQUIVO As String = "Planilhas Excel", _
+                        Optional ByRef EXTENSAO_TIPO_ARQUIVO As String = "*.xls*", _
+                        Optional ByRef TITULO_CAIXA_DIALOGO As String = "Seleciona o arquivo desejado", _
+                        Optional ByRef ABRIR_ARQUIVO As Boolean = True) As String
+'
+' Busca por meio de caixa de diálogo o arquivo desejado
+'
+Dim CAIXADIALOGO As FileDialog
+
+    Application.ScreenUpdating = False
+    NOME_ARQUIVO_ATUAL = ThisWorkbook.Name
+    
+    Set CAIXADIALOGO = Application.FileDialog(msoFileDialogFilePicker)
+    With CAIXADIALOGO
+        .Filters.Add NOME_TIPO_ARQUIVO, EXTENSAO_TIPO_ARQUIVO
+        .Title = TITULO_CAIXA_DIALOGO
+        .InitialFileName = (ActiveWorkbook.Path)
+        .AllowMultiSelect = False
+        
+        If (.Show = -1) Then
+            NOME_ARQUIVO_ABRIR = .SelectedItems(1)
+        Else
+            Buscar_Arquivo_Externo = ""
+            Exit Function
+        End If
+    End With
+    
+    If (ABRIR_ARQUIVO) Then
+        Buscar_Arquivo_Externo = Abrir_Arquivo_Externo(NOME_ARQUIVO_ABRIR)
+    End If
+    
+End Function
+
+Function Abrir_Arquivo_Externo(Optional ByRef NOME_COMPLETO_ARQUIVO As String) As String
+'
+' Abre o arquivo desejado
+'
+    Application.ScreenUpdating = False
+    If NOME_COMPLETO_ARQUIVO = "" Then NOME_COMPLETO_ARQUIVO = NOME_ARQUIVO_ABRIR
+    If NOME_COMPLETO_ARQUIVO <> "" Then
+        Workbooks.Open NOME_COMPLETO_ARQUIVO
+        NOME_ARQUIVO_ABERTO = ActiveWorkbook.Name
+        Abrir_Arquivo_Externo = NOME_ARQUIVO_ABERTO
+    End If
+    
+End Function
+
