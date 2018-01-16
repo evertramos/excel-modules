@@ -144,7 +144,8 @@ Dim COLUMN_NUMBER As Integer
    
         Ativar_Tabela NOME_TABELA
         
-        TABELA.Range.Cells(2, 1).Activate
+        'TABELA.Range.Cells(2, 1).Activate
+        TABELA.Range.Cells(2, 1).Select
         Selecionar_Primeira_Celula_Tabela = True
     
     Exit Function
