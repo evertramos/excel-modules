@@ -666,10 +666,11 @@ Dim COLUMN_NUMBER As Integer
         Set TABELA = ActiveWorkbook.Worksheets(Range(NOME_TABELA).Parent.Name).ListObjects(NOME_TABELA)
     COLUMN_NUMBER = Application.WorksheetFunction.Match(NOME_COLUNA, TABELA.HeaderRowRange, 0)
     
-    If SOMENTE_NAO_VAZIAS Then
+    If TABELA.DataBodyRange.Rows.count = 1 Then
+        retornarQtdLinhasColuna = TABELA.DataBodyRange.Rows.count
+    ElseIf SOMENTE_NAO_VAZIAS Then
         Retornar_Qtd_Linhas_Coluna = TABELA.DataBodyRange.Columns(COLUMN_NUMBER).SpecialCells(xlCellTypeConstants).COUNT
     Else
-        'Retornar_Qtd_Linhas_Coluna = TABELA.DataBodyRange.Columns(COLUMN_NUMBER).Rows.COUNT
         Retornar_Qtd_Linhas_Coluna = TABELA.DataBodyRange.Rows.COUNT
     End If
         
